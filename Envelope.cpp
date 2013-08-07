@@ -1,15 +1,21 @@
 /* Dependencies */
 #include <stdint.h>
+#include <cmath>
 #include "Envelope.h"
 
 namespace CheapTune {
 
-Envelope::Envelope(EnvelopeState_t state) :
-		_adsr(), _state(state), _timeTick(0), _currentTick(0) {
+Envelope::Envelope(EnvelopeState_t state, EnvelopeResponse_t response) :
+		_adsr(), _state(state), _response(response), _timeTick(0), _currentTick(
+				0) {
 }
 
 Envelope::Adsr& Envelope::adsr() {
 	return _adsr;
+}
+
+void Envelope::setResponse(EnvelopeResponse_t response) {
+	_response = response;
 }
 
 void Envelope::setState(EnvelopeState_t state) {
@@ -40,8 +46,14 @@ void Envelope::setState(EnvelopeState_t state) {
 	}
 }
 
-uint8_t Envelope::linearResponse(uint16_t t, uint16_t T, uint8_t MIN, uint8_t MAX) {
+uint8_t Envelope::linearResponse(uint16_t t, uint16_t T, uint8_t MIN,
+		uint8_t MAX) {
 	return ((uint16_t) MAX * t) / T + MIN; // Simple y = ax + b equation
+}
+
+uint8_t Envelope::exponentialResponse(uint16_t t, uint16_t T, uint8_t MIN,
+		uint8_t MAX) {
+	return MIN + (MAX - MIN) * (1 - exp(-5.0 * t / T)); // Capacitor charge equation
 }
 
 uint8_t Envelope::getSample() {
@@ -108,11 +120,21 @@ uint8_t Envelope::getSample() {
 		/* Switch according the current state */
 		switch (_state) {
 		case ENV_ATTACK:
-			sample = linearResponse(_currentTick, _timeTick, 0, 255);
+			if (_response == ENV_LINEAR_RESPONSE)
+				sample = linearResponse(_currentTick, _timeTick, 0, 255);
+			else
+				sample = exponentialResponse(_currentTick, _timeTick, 0, 255);
 			break;
 
 		case ENV_DECAY:
-			sample = 255 - linearResponse(_currentTick, _timeTick, 0, _adsr.sustain_level);
+			if (_response == ENV_LINEAR_RESPONSE)
+				sample = 255
+						- linearResponse(_currentTick, _timeTick, 0,
+								_adsr.sustain_level);
+			else
+				sample = 255
+						- exponentialResponse(_currentTick, _timeTick, 0,
+								_adsr.sustain_level);
 			break;
 
 		case ENV_SUSTAIN:
@@ -120,7 +142,14 @@ uint8_t Envelope::getSample() {
 			break;
 
 		case ENV_RELEASE:
-			sample = _adsr.sustain_level - linearResponse(_currentTick, _timeTick, 0, _adsr.sustain_level);
+			if (_response == ENV_LINEAR_RESPONSE)
+				sample = _adsr.sustain_level
+						- linearResponse(_currentTick, _timeTick, 0,
+								_adsr.sustain_level);
+			else
+				sample = _adsr.sustain_level
+						- exponentialResponse(_currentTick, _timeTick, 0,
+								_adsr.sustain_level);
 			break;
 
 		default:

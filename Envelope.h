@@ -37,8 +37,8 @@ public:
 	 * The ADSR data model structure
 	 */
 	struct Adsr {
-		uint16_t attack_time;  /*!< Attack time (in tick) */
-		uint16_t decay_time;   /*!< Decay time (in tick) */
+		uint16_t attack_time; /*!< Attack time (in tick) */
+		uint16_t decay_time; /*!< Decay time (in tick) */
 		uint8_t sustain_level; /*!< Sustain level (amplitude) */
 		uint16_t release_time; /*!< Release time (in tick) */
 	};
@@ -55,12 +55,23 @@ public:
 		ENV_ENDED    //!< End of envelope
 	} EnvelopeState_t;
 
+	/**
+	 * Envelope responses enumeration
+	 */
+	typedef enum {
+		ENV_LINEAR_RESPONSE,     //!< Linear response
+		ENV_EXPONENTIAL_RESPONSE //!< Exponential response
+	} EnvelopeResponse_t;
+
 protected:
 	/** ADSR envelope data */
 	Adsr _adsr;
 
 	/** Envelope state */
 	EnvelopeState_t _state;
+
+	/** Envelope response mode */
+	EnvelopeResponse_t _response;
 
 	/** Time tick before state upgrade */
 	uint16_t _timeTick;
@@ -84,15 +95,30 @@ protected:
 	 * @param MAX Max amplitude value
 	 * @return The linear response for the given time value
 	 */
-	static uint8_t linearResponse(uint16_t t, uint16_t T, uint8_t MIN, uint8_t MAX);
+	static uint8_t linearResponse(uint16_t t, uint16_t T, uint8_t MIN,
+			uint8_t MAX);
+
+	/**
+	 * Advanced exponential response formula
+	 *
+	 * @param t Time value between 0 and T
+	 * @param T Max time value
+	 * @param MIN Min amplitude value
+	 * @param MAX Max amplitude value
+	 * @return The linear response for the given time value
+	 */
+	static uint8_t exponentialResponse(uint16_t t, uint16_t T, uint8_t MIN,
+			uint8_t MAX);
 
 public:
 	/**
+	 * Instantiate a new ADSR envelope
 	 *
-	 * @param adsr
-	 * @param state
+	 * @param state The envelope state
+	 * @param response The response mode
 	 */
-	Envelope(EnvelopeState_t state = ENV_DISABLE);
+	Envelope(EnvelopeState_t state = ENV_DISABLE, EnvelopeResponse_t response =
+			ENV_LINEAR_RESPONSE);
 
 	/**
 	 * Get a reference to the ADSR data model of this envelope
@@ -107,6 +133,13 @@ public:
 	 * @param state The new state of the envelope
 	 */
 	void setState(EnvelopeState_t state);
+
+	/**
+	 * Set the response of the envelope
+	 *
+	 * @param response The new response of the envelope
+	 */
+	void setResponse(EnvelopeResponse_t response);
 
 	/**
 	 * Reset all parameters to their default values
