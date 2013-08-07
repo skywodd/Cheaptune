@@ -30,9 +30,10 @@ Here a list of references used to create this program :
 + 8 bits sound output quality
 + 7 waveform per oscillator/channel (None, DC, Sinus, Triangle, Square, Sawtooth, Noise)
 + Oscillator sync and ring modulation support (work in progress)
-+ 1 ADSR envelope (user defined) per channel with linear or exponential response (user defined)
++ ADSR envelope per channel with linear or exponential response (full user defined)
 + Compilation-time definable number of channels
 + Global mixer with volume control and independent volume control per channel
-+ 5 digital filter available (Passthrough, low-pass, high-pass, band-pass, notch) (Work in progress)
-+ Only integer operation (no floating point unit required) (Work in progress)
-+ Integrated tracker-bytecode decoder (Work in progress)
++ 5 digital filter available (passthrough, low-pass, high-pass, band-pass, notch) (Work in progress)
++ Integrated tracker-bytecode decoder (TODO)
+
+Warning: Require floating point math for exponential response and filter (if used).

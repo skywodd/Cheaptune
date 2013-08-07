@@ -67,26 +67,27 @@ int main(int argc, char** argv) {
 	std::cout << "Filter setup ..." << std::endl;
 	mixer.filter().setCoeffLow(CheapTune::Filter::computeFrequencyLowPass(660));
 	mixer.filter().setCoeffHigh(CheapTune::Filter::computeFrequencyLowPass(990));
-	mixer.filter().setMode(CheapTune::Filter::FILTER_LOWPASS);
+	mixer.filter().setMode(CheapTune::Filter::FILTER_PASSTHROUGH);
 
 	/* Channels setup */
 	std::cout << "Channel 1 setup ..." << std::endl;
 	mixer.channel(0).setAmplitude(255);
 	mixer.channel(0).oscillator().setFrequency(330);
-	//mixer.channel(0).oscillator().waveform().setDuty(255);
+	mixer.channel(0).oscillator().waveform().setDuty(255);
 	mixer.channel(0).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_SINUS);
-	//mixer.channel(0).envelope().adsr().attack_time = 0;
-	//mixer.channel(0).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 50);
-	//mixer.channel(0).envelope().adsr().sustain_level = 127;
-	//mixer.channel(0).envelope().adsr().release_time = (SAMPLE_RATE / 1000 * 50);
-	mixer.channel(0).envelope().setState(CheapTune::Envelope::ENV_DISABLE);
+			CheapTune::Waveform::WAVE_DC);
+	mixer.channel(0).envelope().adsr().attack_time = (SAMPLE_RATE / 1000 * 250);
+	mixer.channel(0).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 250);
+	mixer.channel(0).envelope().adsr().sustain_level = 127;
+	mixer.channel(0).envelope().adsr().release_time = (SAMPLE_RATE / 1000 * 50);
+	mixer.channel(0).envelope().setResponse(CheapTune::Envelope::ENV_EXPONENTIAL_RESPONSE);
+	mixer.channel(0).envelope().setState(CheapTune::Envelope::ENV_ATTACK);
 	std::cout << "Channel 2 setup ..." << std::endl;
 	mixer.channel(1).setAmplitude(255);
 	mixer.channel(1).oscillator().setFrequency(660);
 	//mixer.channel(1).oscillator().waveform().setDuty(255);
 	mixer.channel(1).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_SINUS);
+			CheapTune::Waveform::WAVE_NONE);
 	//mixer.channel(1).envelope().adsr().attack_time = 0;
 	//mixer.channel(1).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 50);
 	//mixer.channel(1).envelope().adsr().sustain_level = 127;
@@ -97,7 +98,7 @@ int main(int argc, char** argv) {
 	mixer.channel(2).oscillator().setFrequency(990);
 	//mixer.channel(2).oscillator().waveform().setDuty(255);
 	mixer.channel(2).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_SINUS);
+			CheapTune::Waveform::WAVE_NONE);
 	//mixer.channel(2).envelope().adsr().attack_time = 0;
 	//mixer.channel(2).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 50);
 	//mixer.channel(2).envelope().adsr().sustain_level = 127;
@@ -108,7 +109,7 @@ int main(int argc, char** argv) {
 	mixer.channel(3).oscillator().setFrequency(1320);
 	//mixer.channel(3).oscillator().waveform().setDuty(255);
 	mixer.channel(3).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_SINUS);
+			CheapTune::Waveform::WAVE_NONE);
 	//mixer.channel(3).envelope().adsr().attack_time = 0;
 	//mixer.channel(3).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 50);
 	//mixer.channel(3).envelope().adsr().sustain_level = 127;
