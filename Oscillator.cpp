@@ -6,7 +6,7 @@
 namespace CheapTune {
 
 Oscillator::Oscillator(uint16_t frequency) :
-		_waveform(), _tuningWord(0), _phaseAccumulator(0) {
+		_waveform(), _tuningWord(0), _phaseAccumulator(0), _syncFlag(0) {
 	if (frequency)
 		setFrequency(frequency);
 }
@@ -23,7 +23,11 @@ int8_t Oscillator::getSample() {
 	int8_t sample = _waveform.getSample(_phaseAccumulator);
 
 	/* Go to the next sample index */
-	_phaseAccumulator = ((uint16_t) _phaseAccumulator + _tuningWord) & 0xFF;
+	uint16_t acc = (uint16_t) _phaseAccumulator + _tuningWord;
+	_phaseAccumulator = acc & 0xFF;
+
+	/* Set the sync flag */
+	_syncFlag = !!(acc & 0xFF00);
 
 	/* Return the sample */
 	return sample;
@@ -32,6 +36,14 @@ int8_t Oscillator::getSample() {
 void Oscillator::reset() {
 	_waveform.reset();
 	_tuningWord = 0;
+	_phaseAccumulator = 0;
+}
+
+uint8_t Oscillator::isCycleFinished() const {
+	return _syncFlag;
+}
+
+void Oscillator::restartCycle() {
 	_phaseAccumulator = 0;
 }
 

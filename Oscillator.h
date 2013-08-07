@@ -45,6 +45,9 @@ protected:
 	/** Phase accumulator for DDS */
 	uint8_t _phaseAccumulator;
 
+	/**	Sync flag */
+	uint8_t _syncFlag;
+
 	/**
 	 * Get a sample from the oscillator
 	 *
@@ -71,6 +74,18 @@ public:
 	 * Reset all parameters to their default values
 	 */
 	void reset();
+
+	/**
+	 * Get the sync flag (set if the waveform cycle is done)
+	 *
+	 * @return True if the current waveform cycle is done
+	 */
+	uint8_t isCycleFinished() const;
+
+	/**
+	 * Synchronize the oscillator (restart the waveform cycle)
+	 */
+	void restartCycle();
 
 	/**
 	 * Get a reference to the waveform generator
