@@ -17,7 +17,7 @@ int8_t Mixer::mixTwoSamples(int16_t A, int16_t B) {
 	int16_t Z;
 	if (A < 0 && B < 0)
 		Z = (A + B) - ((A * B) / -127);
-	else if (A > 0 & B > 0)
+	else if ((A > 0) & (B > 0))
 		Z = (A + B) - ((A * B) / 127);
 	else
 		Z = A + B;
