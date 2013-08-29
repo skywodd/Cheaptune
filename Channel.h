@@ -1,7 +1,7 @@
 /**
- * @brief Channel instance object
+ * @brief Channel wrapper
  * @author SkyWodd
- * @version 1.0
+ * @version 2.0
  * @see http://skyduino.wordpress.com/
  *
  * @section licence_sec License
@@ -22,50 +22,59 @@
 #define	CHANNEL_H
 
 /* Dependencies */
-#include "Oscillator.h"
-#include "Envelope.h"
+#include "defines.h"
 
 /* CheapTune namespace */
 namespace CheapTune {
 
-/** Forward declaration of the Mixer class */
-class Mixer;
+/** Forward declaration of the Oscillator and Envelope class */
+class Oscillator;
+class Envelope;
 
 /**
  * Channel instance class
  */
 class Channel {
 protected:
-	/** Oscillator instance of the channel */
-	Oscillator _oscillator;
+	/** Oscillator instance */
+	Oscillator* _oscillator;
 
-	/** Envelope instance of the channel */
-	Envelope _envelope;
+	/** Envelope instance */
+	Envelope* _envelope;
 
 	/** Amplitude of the channel */
-	uint8_t _amplitude;
-
-	/**
-	 * Compute and return a sample for this channel
-	 *
-	 * @return The computed sample
-	 */
-	int8_t getSample();
+	Amplitude_t _amplitude;
 
 public:
 	/**
 	 * Instantiate a new channel
 	 *
+	 * @param oscillator Oscillator instance to use
+	 * @param envelope Envelope instance to use
 	 * @param amplitude The amplitude of this channel
 	 */
-	Channel(uint8_t amplitude = 255);
+	Channel(Oscillator* oscillator = 0, Envelope* envelope = 0, Amplitude_t amplitude = 255);
+
+	/**
+	 * Set the oscillator instance
+	 *
+	 * @param oscillator The new oscillator instance to use
+	 */
+	void setOscillator(Oscillator* oscillator);
+
+	/**
+	 * Set the envelope instance
+	 *
+	 * @param envelope The new envelope instance to use
+	 */
+	void setEnvelope(Envelope* envelope);
 
 	/**
 	 * Set the amplitude of this channel
 	 *
 	 * @param amplitude The new amplitude of this channel
 	 */
-	void setAmplitude(uint8_t amplitude);
+	void setAmplitude(Amplitude_t amplitude);
 
 	/**
 	 * Reset all parameters to their default values
@@ -73,21 +82,25 @@ public:
 	void reset();
 
 	/**
-	 * Get a reference to the oscillator instance of this channel
+	 * Compute and return a sample for this channel
 	 *
-	 * @return A reference to the oscillator instance of this channel
+	 * @return The computed sample
 	 */
-	Oscillator& oscillator();
+	Sample_t getSample();
 
 	/**
-	 * Get a reference to the envelope instance of this channel
+	 * Get a pointer to the oscillator instance of this channel
 	 *
-	 * @return A reference to the envelope instance of this channel
+	 * @return A pointer to the oscillator instance of this channel
 	 */
-	Envelope& envelope();
+	Oscillator* oscillator();
 
-	/** Mixer class can access to protected members */
-	friend Mixer;
+	/**
+	 * Get a pointer to the envelope instance of this channel
+	 *
+	 * @return A pointer to the envelope instance of this channel
+	 */
+	Envelope* envelope();
 
 };
 

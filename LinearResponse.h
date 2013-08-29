@@ -1,5 +1,5 @@
 /**
- * @brief Waveform generation - common base API
+ * @brief Envelope response - linear response
  * @author SkyWodd
  * @version 2.0
  * @see http://skyduino.wordpress.com/
@@ -18,41 +18,26 @@
  *  You should have received a copy of the GNU General Public License\n
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\n
  */
-#ifndef WAVEFORM_H
-#define	WAVEFORM_H
+#ifndef LINEARRESPONSE_H
+#define LINEARRESPONSE_H
 
 /* Dependencies */
-#include "defines.h"
+#include "Response.h"
 
 /** CheapTune namespace */
 namespace CheapTune {
 
 /**
- * Low level waveform generation base class
+ * Linear envelope response class
  */
-class Waveform {
+class LinearResponse: public CheapTune::Response {
 public:
-	/**
-	 * Virtual destructor
-	 */
-	virtual ~Waveform();
 
-	/**
-	 * Reset all parameters to their default values
-	 */
-	virtual void reset();
-
-	/**
-	 * Compute and return one sample from the waveform generator
-	 *
-	 * @param index The sample index in the waveform generator table
-	 * @return The computed sample for the given index
-	 */
-	virtual Sample_t getSample(WavetableIndex_t index);
+	Amplitude_t getResponse(WavetableIndex_t t, WavetableIndex_t T,
+				Amplitude_t MIN, Amplitude_t MAX);
 
 };
 
 }
 
-#endif	/* WAVEFORM_H */
-
+#endif /* LINEARRESPONSE_H */

@@ -5,29 +5,29 @@
 
 namespace CheapTune {
 
-Mixer::Mixer(uint8_t globalAmplitude) :
-		_channels(), _filter(), _globalAmplitude(globalAmplitude) {
+Mixer::Mixer(Amplitude_t globalAmplitude) :
+		_channels(), /*_filter(),*/ _globalAmplitude(globalAmplitude) {
 }
 
-void Mixer::setGlobalAmplitude(uint8_t globalAmplitude) {
+void Mixer::setGlobalAmplitude(Amplitude_t globalAmplitude) {
 	_globalAmplitude = globalAmplitude;
 }
 
-int8_t Mixer::mixTwoSamples(int16_t A, int16_t B) {
-	int16_t Z;
+Sample_t Mixer::mixTwoSamples(Sample_t _A, Sample_t _B) {
+	int32_t Z, A = _A, B = _B;
 	if (A < 0 && B < 0)
-		Z = (A + B) - ((A * B) / -127);
+		Z = (A + B) - ((A * B) / SAMPLE_VMIN);
 	else if ((A > 0) & (B > 0))
-		Z = (A + B) - ((A * B) / 127);
+		Z = (A + B) - ((A * B) / SAMPLE_VMAX);
 	else
 		Z = A + B;
 	return Z;
 }
 
-int8_t Mixer::getSample() {
+Sample_t Mixer::getSample() {
 
 	/* Get the first channel sample */
-	int8_t sample = _channels[0].getSample();
+	Sample_t sample = _channels[0].getSample();
 
 	/* Get all other channels samples */
 	for (unsigned char i = 1; i < CHANNELS_COUNT; ++i) {
@@ -37,7 +37,7 @@ int8_t Mixer::getSample() {
 	}
 
 	/* Pass the resulting sample into the filter */
-	sample = _filter.computeSample(sample);
+	//sample = _filter.computeSample(sample);
 
 	/* Amplitude modulate the sample */
 	sample = AmplitudeModulator::compute(sample, _globalAmplitude);
@@ -49,7 +49,7 @@ int8_t Mixer::getSample() {
 void Mixer::reset() {
 	for (unsigned char i = 0; i < CHANNELS_COUNT; ++i)
 		_channels[i].reset();
-	_filter.reset();
+	//_filter.reset();
 	_globalAmplitude = 255;
 }
 
@@ -57,8 +57,8 @@ Channel& Mixer::channel(unsigned char index) {
 	return _channels[index];
 }
 
-Filter& Mixer::filter() {
+/*Filter& Mixer::filter() {
 	return _filter;
-}
+}*/
 
 }

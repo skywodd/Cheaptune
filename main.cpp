@@ -1,7 +1,7 @@
 /**
  * @brief Tiny but strong chiptune generator
  * @author SkyWodd
- * @version 1.0
+ * @version 2.0
  * @see http://skyduino.wordpress.com/
  *
  * @section licence_sec License
@@ -23,26 +23,53 @@
 #include <iostream>
 #include <cstdio>
 #include <stdint.h>
+
+/* Cheaptune runtime */
+#include "defines.h"
+#include "AmplitudeModulator.h"
+#include "Waveform.h"
+#include "Oscillator.h"
+#include "LowFrequencyOscillator.h"
+#include "Channel.h"
+#include "Envelope.h"
 #include "Mixer.h"
 
+/* Dependencies - waveforms */
+#include "DCWaveform.h"
+#include "NoiseWaveform.h"
+#include "SawtoothWaveform.h"
+#include "SinusWaveform.h"
+#include "SquareWaveform.h"
+#include "TriangleWaveform.h"
+
+/* Dependencies - ADSR envelope */
+#include "AdsrEnvelope.h"
+#include "ExponentialResponse.h"
+#include "LinearResponse.h"
+
+/** Number of second of sound to be generated */
 #define NB_SECONDS_RUN 5
+
+/** Output filename */
 #define OUTPUT_FILENAME "output.wav"
 
+/**
+ * Wave file header
+ */
 typedef struct {
-	char RIFF[4];        // RIFF Header Magic header
-	uint32_t ChunkSize;      // RIFF Chunk Size
-	char WAVE[4];        // WAVE Header
-	char fmt[4];         // FMT header
-	uint32_t Subchunk1Size;  // Size of the fmt chunk
+	char RIFF[4];           // RIFF Header Magic header
+	uint32_t ChunkSize;     // RIFF Chunk Size
+	char WAVE[4];           // WAVE Header
+	char fmt[4];            // FMT header
+	uint32_t Subchunk1Size; // Size of the fmt chunk
 	uint16_t AudioFormat; // Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
-	uint16_t NumOfChan;      // Number of channels 1=Mono 2=Sterio
-	uint32_t SamplesPerSec;  // Sampling Frequency in Hz
-	uint32_t bytesPerSec;    // bytes per second
-	uint16_t blockAlign;     // 2=16-bit mono, 4=16-bit stereo
-	uint16_t bitsPerSample;  // Number of bits per sample
-	char Subchunk2ID[4]; // "data"  string
-	uint32_t Subchunk2Size;  // Sampled data length
-
+	uint16_t NumOfChan;     // Number of channels 1=Mono 2=Sterio
+	uint32_t SamplesPerSec; // Sampling Frequency in Hz
+	uint32_t bytesPerSec;   // bytes per second
+	uint16_t blockAlign;    // 2=16-bit mono, 4=16-bit stereo
+	uint16_t bitsPerSample; // Number of bits per sample
+	char Subchunk2ID[4];    // "data"  string
+	uint32_t Subchunk2Size; // Sampled data length
 } WavHeader_t;
 
 /**
@@ -63,60 +90,45 @@ int main(int argc, char** argv) {
 	std::cout << "Mixer setup ..." << std::endl;
 	mixer.setGlobalAmplitude(255);
 
-	/* Filter setup */
-	std::cout << "Filter setup ..." << std::endl;
-	mixer.filter().setCoeffLow(CheapTune::Filter::computeFrequencyLowPass(660));
-	mixer.filter().setCoeffHigh(CheapTune::Filter::computeFrequencyLowPass(990));
-	mixer.filter().setMode(CheapTune::Filter::FILTER_PASSTHROUGH);
+	/* Common setup */
+	CheapTune::LinearResponse rl;
+	CheapTune::ExponentialResponse re;
+	CheapTune::AdsrEnvelope::AdsrTiming_t a;
+	a.attack_time = CheapTune::AdsrEnvelope::msToTick(100);
+	a.decay_time = CheapTune::AdsrEnvelope::msToTick(50);
+	a.sustain_level = 127;
+	a.release_time = CheapTune::AdsrEnvelope::msToTick(100);
 
 	/* Channels setup */
-	std::cout << "Channel 1 setup ..." << std::endl;
-	mixer.channel(0).setAmplitude(255);
-	mixer.channel(0).oscillator().setFrequency(330);
-	mixer.channel(0).oscillator().waveform().setDuty(255);
-	mixer.channel(0).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_DC);
-	mixer.channel(0).envelope().adsr().attack_time = (SAMPLE_RATE / 1000 * 250);
-	mixer.channel(0).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 250);
-	mixer.channel(0).envelope().adsr().sustain_level = 127;
-	mixer.channel(0).envelope().adsr().release_time = (SAMPLE_RATE / 1000 * 50);
-	mixer.channel(0).envelope().setResponse(CheapTune::Envelope::ENV_EXPONENTIAL_RESPONSE);
-	mixer.channel(0).envelope().setState(CheapTune::Envelope::ENV_ATTACK);
-	std::cout << "Channel 2 setup ..." << std::endl;
-	mixer.channel(1).setAmplitude(255);
-	mixer.channel(1).oscillator().setFrequency(660);
-	//mixer.channel(1).oscillator().waveform().setDuty(255);
-	mixer.channel(1).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_NONE);
-	//mixer.channel(1).envelope().adsr().attack_time = 0;
-	//mixer.channel(1).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 50);
-	//mixer.channel(1).envelope().adsr().sustain_level = 127;
-	//mixer.channel(1).envelope().adsr().release_time = (SAMPLE_RATE / 1000 * 50);
-	mixer.channel(1).envelope().setState(CheapTune::Envelope::ENV_DISABLE);
-	std::cout << "Channel 3 setup ..." << std::endl;
-	mixer.channel(2).setAmplitude(255);
-	mixer.channel(2).oscillator().setFrequency(990);
-	//mixer.channel(2).oscillator().waveform().setDuty(255);
-	mixer.channel(2).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_NONE);
-	//mixer.channel(2).envelope().adsr().attack_time = 0;
-	//mixer.channel(2).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 50);
-	//mixer.channel(2).envelope().adsr().sustain_level = 127;
-	//mixer.channel(2).envelope().adsr().release_time = (SAMPLE_RATE / 1000 * 50);
-	mixer.channel(2).envelope().setState(CheapTune::Envelope::ENV_DISABLE);
-	std::cout << "Channel 4 setup ..." << std::endl;
-	mixer.channel(3).setAmplitude(255);
-	mixer.channel(3).oscillator().setFrequency(1320);
-	//mixer.channel(3).oscillator().waveform().setDuty(255);
-	mixer.channel(3).oscillator().waveform().setWaveform(
-			CheapTune::Waveform::WAVE_NONE);
-	//mixer.channel(3).envelope().adsr().attack_time = 0;
-	//mixer.channel(3).envelope().adsr().decay_time = (SAMPLE_RATE / 1000 * 50);
-	//mixer.channel(3).envelope().adsr().sustain_level = 127;
-	//mixer.channel(3).envelope().adsr().release_time = (SAMPLE_RATE / 1000 * 50);
-	mixer.channel(3).envelope().setState(CheapTune::Envelope::ENV_DISABLE);
+	CheapTune::SinusWaveform w1;
+	CheapTune::Envelope e1;
+	CheapTune::Oscillator o1(&w1, 440);
+	mixer.channel(0).setAmplitude(0);
+	mixer.channel(0).setOscillator(&o1);
+	mixer.channel(0).setEnvelope(&e1);
 
-	/* Open output sound file */
+	CheapTune::SinusWaveform w2;
+	CheapTune::AdsrEnvelope e2(&re, a);
+	CheapTune::Oscillator o2(&w2, 440);
+	mixer.channel(1).setAmplitude(255);
+	mixer.channel(1).setOscillator(&o2);
+	mixer.channel(1).setEnvelope(&e2);
+
+	CheapTune::DCWaveform w3;
+	CheapTune::Envelope e3;
+	CheapTune::Oscillator o3(&w3);
+	mixer.channel(2).setAmplitude(0);
+	mixer.channel(2).setOscillator(&o3);
+	mixer.channel(2).setEnvelope(&e3);
+
+	CheapTune::DCWaveform w4;
+	CheapTune::Envelope e4;
+	CheapTune::Oscillator o4(&w4);
+	mixer.channel(3).setAmplitude(0);
+	mixer.channel(3).setOscillator(&o4);
+	mixer.channel(3).setEnvelope(&e4);
+
+	/* Create output file */
 	std::cout << "Creating output file " << OUTPUT_FILENAME << std::endl;
 	FILE* fo = fopen(OUTPUT_FILENAME, "wb");
 	if (fo == NULL) {
@@ -124,6 +136,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+	/* Fill wave file header */
 	WavHeader_t whead;
 	whead.RIFF[0] = 'R';
 	whead.RIFF[1] = 'I';
@@ -151,7 +164,7 @@ int main(int argc, char** argv) {
 	whead.Subchunk2ID[3] = 'a';
 	whead.Subchunk2Size = SAMPLE_RATE * NB_SECONDS_RUN * 2;
 
-	/* Write header */
+	/* Write file header */
 	std::cout << "Writing WAVE header ..." << std::endl;
 	fwrite(&whead, sizeof(WavHeader_t), 1, fo);
 
@@ -159,23 +172,27 @@ int main(int argc, char** argv) {
 	for (uint16_t i = 0; i < NB_SECONDS_RUN; ++i) {
 
 		/* Samples buffer */
-		int16_t buffer[SAMPLE_RATE];
+		CheapTune::Sample_t buffer[SAMPLE_RATE];
 
 		/* Run the sound generator for one second */
 		std::cout << "Sound generation " << i + 1 << " of " << NB_SECONDS_RUN
 				<< std::endl;
-		for (uint16_t j = 0; j < SAMPLE_RATE; ++j)
-			buffer[j] = mixer.getSample() * 256;
-		//mixer.channel(0).envelope().setState(CheapTune::Envelope::ENV_RELEASE);
+
+		((CheapTune::AdsrEnvelope*) mixer.channel(1).envelope())->noteOn();
+		for (uint16_t j = 0; j < SAMPLE_RATE; ++j) {
+			buffer[j] = mixer.getSample();
+
+			if (j == (SAMPLE_RATE / 2))
+				((CheapTune::AdsrEnvelope*) mixer.channel(1).envelope())->noteOff();
+		}
 
 		/* Write the buffer */
 		std::cout << "Writing sound buffer ..." << std::endl;
-		fwrite(buffer, sizeof(int16_t), SAMPLE_RATE, fo);
+		fwrite(buffer, sizeof(CheapTune::Sample_t), SAMPLE_RATE, fo);
 	}
 
-	std::cout << "Cheaptune exiting ..." << std::endl;
-
 	/* No error */
+	std::cout << "Cheaptune exiting ..." << std::endl;
 	return 0;
 }
 

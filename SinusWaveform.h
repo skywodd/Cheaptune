@@ -1,7 +1,7 @@
 /**
- * @brief Project configuration file
+ * @brief Waveform generation - sinus waveform
  * @author SkyWodd
- * @version 1.0
+ * @version 2.0
  * @see http://skyduino.wordpress.com/
  *
  * @section licence_sec License
@@ -18,14 +18,29 @@
  *  You should have received a copy of the GNU General Public License\n
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\n
  */
-#ifndef CONFIG_H
-#define	CONFIG_H
+#ifndef SINUSWAVEFORM_H
+#define SINUSWAVEFORM_H
 
-/** Audio sample rate */
-#define SAMPLE_RATE 8000
+/* Dependencies */
+#include "Waveform.h"
 
-/** Number of channels */
-#define CHANNELS_COUNT 4
+/** CheapTune namespace */
+namespace CheapTune {
 
-#endif	/* CONFIG_H */
+/**
+ * Sinus waveform generation class
+ */
+class SinusWaveform: public CheapTune::Waveform {
+protected:
+	/** Sinus wave table (only 1/4 of sinus wave required) */
+	static const Sample_t _sinusWavetable[WAVETABLE_SAMPLES_COUNT / 4] PROGMEM;
 
+public:
+
+	Sample_t getSample(WavetableIndex_t index);
+
+};
+
+}
+
+#endif /* SINUSWAVEFORM_H */

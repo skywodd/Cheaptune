@@ -1,7 +1,7 @@
 /**
  * @brief Amplitude modulation routines
  * @author SkyWodd
- * @version 1.0
+ * @version 2.0
  * @see http://skyduino.wordpress.com/
  *
  * @section licence_sec License
@@ -21,6 +21,9 @@
 #ifndef AMPLITUDEMODULATOR_H
 #define	AMPLITUDEMODULATOR_H
 
+/* Dependencies */
+#include "defines.h"
+
 /** CheapTune namespace */
 namespace CheapTune {
 
@@ -37,8 +40,8 @@ public:
 	 * @param amplitude The amplitude to apply on the sample
 	 * @return The amplitude modulated sample
 	 */
-	static uint8_t compute(int8_t sample, uint8_t amplitude) {
-		return ((int16_t) sample) * amplitude / 255;
+	static Sample_t compute(Sample_t sample, Amplitude_t amplitude) {
+		return ((int32_t) sample) * amplitude / 255;
 	}
 
 	/**
@@ -47,7 +50,7 @@ public:
 	 * @param percent The volume in percent
 	 * @return The computed amplitude value
 	 */
-	static uint8_t percentToAmplitude(uint8_t percent) {
+	static Amplitude_t percentToAmplitude(uint8_t percent) {
 		return ((uint16_t) percent) * 255 / 100;
 	}
 

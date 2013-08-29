@@ -1,5 +1,5 @@
 /**
- * @brief Waveform generation - common base API
+ * @brief Waveform generation - DC waveform
  * @author SkyWodd
  * @version 2.0
  * @see http://skyduino.wordpress.com/
@@ -18,41 +18,44 @@
  *  You should have received a copy of the GNU General Public License\n
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\n
  */
-#ifndef WAVEFORM_H
-#define	WAVEFORM_H
+#ifndef DCWAVEFORM_H
+#define DCWAVEFORM_H
 
 /* Dependencies */
-#include "defines.h"
+#include "Waveform.h"
 
 /** CheapTune namespace */
 namespace CheapTune {
 
 /**
- * Low level waveform generation base class
+ * DC waveform generation class
  */
-class Waveform {
+class DCWaveform: public CheapTune::Waveform {
+protected:
+	/** DC signal level */
+	Sample_t _level;
+
 public:
 	/**
-	 * Virtual destructor
-	 */
-	virtual ~Waveform();
-
-	/**
-	 * Reset all parameters to their default values
-	 */
-	virtual void reset();
-
-	/**
-	 * Compute and return one sample from the waveform generator
+	 * Instantiate a new DCWaveform generator
 	 *
-	 * @param index The sample index in the waveform generator table
-	 * @return The computed sample for the given index
+	 * @param level DC signal level
 	 */
-	virtual Sample_t getSample(WavetableIndex_t index);
+	DCWaveform(Sample_t level = 0);
+
+	/**
+	 * Set the DC signal level
+	 *
+	 * @param level The new DC signal level
+	 */
+	void setDcLevel(Sample_t level);
+
+	void reset();
+
+	Sample_t getSample(WavetableIndex_t index);
 
 };
 
 }
 
-#endif	/* WAVEFORM_H */
-
+#endif /* DCWAVEFORM_H */

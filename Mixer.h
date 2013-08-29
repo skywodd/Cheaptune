@@ -1,7 +1,7 @@
 /**
  * @brief Mixer class
  * @author SkyWodd
- * @version 1.0
+ * @version 2.0
  * @see http://skyduino.wordpress.com/
  *
  * @section licence_sec License
@@ -23,8 +23,7 @@
 
 /* Dependencies */
 #include "Channel.h"
-#include "Filter.h"
-#include "config.h"
+//#include "Filter.h"
 
 /** CheapTune namespace */
 namespace CheapTune {
@@ -37,11 +36,11 @@ protected:
 	/** Channels instances */
 	Channel _channels[CHANNELS_COUNT];
 
-	/** Filter instance */
-	Filter _filter;
+	/*/* Filter instance */
+	//Filter _filter;
 
 	/** Global amplitude */
-	uint8_t _globalAmplitude;
+	Amplitude_t _globalAmplitude;
 
 public:
 	/**
@@ -49,21 +48,21 @@ public:
 	 *
 	 * @param globalAmplitude The global amplitude of the mixer
 	 */
-	Mixer(uint8_t globalAmplitude = 255);
+	Mixer(Amplitude_t globalAmplitude = 255);
 
 	/**
 	 * Set the global amplitude of the mixer
 	 *
 	 * @param globalAmplitude The new global amplitude of the mixer
 	 */
-	void setGlobalAmplitude(uint8_t globalAmplitude);
+	void setGlobalAmplitude(Amplitude_t globalAmplitude);
 
 	/**
 	 * Get a sample from all channels, mix them, pass through the filter and return it !
 	 *
 	 * @return The final output sample
 	 */
-	int8_t getSample();
+	Sample_t getSample();
 
 	/**
 	 * Reset all parameters to their default values
@@ -78,12 +77,12 @@ public:
 	 */
 	Channel& channel(unsigned char index);
 
-	/**
+	/*/*
 	 * Get a reference to the filter instance of the mixer
 	 *
 	 * @return A reference to the filter instance of the mixer
 	 */
-	Filter& filter();
+	//Filter& filter();
 
 	/**
 	 * Mix two samples together
@@ -92,7 +91,7 @@ public:
 	 * @param B The second sample
 	 * @return The two samples mixed together
 	 */
-	static int8_t mixTwoSamples(int16_t A, int16_t B);
+	static Sample_t mixTwoSamples(Sample_t A, Sample_t B);
 
 };
 

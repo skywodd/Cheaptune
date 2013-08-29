@@ -1,7 +1,7 @@
 /**
  * @brief High level waveform generation routine
  * @author SkyWodd
- * @version 1.0
+ * @version 2.0
  * @see http://skyduino.wordpress.com/
  *
  * @section licence_sec License
@@ -22,13 +22,13 @@
 #define	OSCILLATOR_H
 
 /* Dependencies */
-#include "Waveform.h"
+#include "defines.h"
 
 /** CheapTune namespace */
 namespace CheapTune {
 
-/** Forward declaration of Channel class */
-class Channel;
+/* Forward declaration of Waveform class */
+class Waveform;
 
 /**
  * High level waveform generation class
@@ -36,66 +36,78 @@ class Channel;
  */
 class Oscillator {
 protected:
-	/** Waveform generator */
-	Waveform _waveform;
+	/** Waveform generator instance */
+	Waveform* _waveform;
 
 	/** Tuning word for DDS */
-	uint8_t _tuningWord;
+	WavetableIndex_t _tuningWord;
 
 	/** Phase accumulator for DDS */
-	uint8_t _phaseAccumulator;
+	WavetableIndex_t _phaseAccumulator;
 
 	/**	Sync flag */
-	uint8_t _syncFlag;
-
-	/**
-	 * Get a sample from the oscillator
-	 *
-	 * @return The generated sample
-	 */
-	int8_t getSample();
+	bool _syncFlag;
 
 public:
 	/**
 	 * Instantiate a new oscillator
 	 *
+	 * @param waveform The waveform generator instance to use
 	 * @param frequency The frequency of the oscillator
 	 */
-	Oscillator(uint16_t frequency = 0);
+	Oscillator(Waveform* waveform, Frequency_t frequency = 0);
+
+	/**
+	 * Default destructor
+	 */
+	virtual ~Oscillator();
 
 	/**
 	 * Set the frequency of the oscillator
 	 *
 	 * @param frequency The new frequency of the oscillator
 	 */
-	void setFrequency(uint16_t frequency);
+	virtual void setFrequency(Frequency_t frequency);
+
+	/**
+	 * Set the waveform generator instance
+	 *
+	 * @param waveform A pointer to the new waveform generator
+	 */
+	void setWaveform(Waveform* waveform);
 
 	/**
 	 * Reset all parameters to their default values
 	 */
-	void reset();
+	virtual void reset();
 
 	/**
 	 * Get the sync flag (set if the waveform cycle is done)
 	 *
 	 * @return True if the current waveform cycle is done
 	 */
-	uint8_t isCycleFinished() const;
+	bool isCycleFinished() const;
 
 	/**
 	 * Synchronize the oscillator (restart the waveform cycle)
+	 *
+	 * @param index Optional index for re-sync
 	 */
-	void restartCycle();
+	virtual void restartCycle(WavetableIndex_t index = 0);
 
 	/**
-	 * Get a reference to the waveform generator
+	 * Get a sample from the oscillator
 	 *
-	 * @return A reference to the waveform generator of this oscillator
+	 * @return The generated sample
 	 */
-	Waveform& waveform();
+	virtual Sample_t getSample();
 
-	/** Channel class can access to protected members */
-	friend Channel;
+	/**
+	 * Get a pointer to the waveform generator
+	 *
+	 * @return A pointer to the waveform generator of this oscillator
+	 */
+	Waveform* waveform();
 
 };
 
