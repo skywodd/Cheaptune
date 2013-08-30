@@ -30,6 +30,7 @@ namespace CheapTune {
 ///TODO Move this defines to makefile
 #define SAMPLE_RATE 8000
 #define CHANNELS_COUNT 4
+#define PCM_SAMPLES_COUNT 8192
 #define WAVETABLE_BITSIZE 12
 #define WAVETABLE_EXP_BITSIZE 12
 
@@ -62,6 +63,9 @@ typedef uint16_t BigAmplitude_t;
 
 /** Audio sample type */
 typedef int16_t Sample_t;
+
+/** Audio sample count type */
+typedef uint16_t SampleCount_t;
 
 /** Max sample value */
 #define SAMPLE_VMAX (32767)

@@ -27,10 +27,13 @@
 /* Cheaptune runtime */
 #include "defines.h"
 #include "AmplitudeModulator.h"
-#include "StandardOscillator.h"
-#include "LowFrequencyOscillator.h"
 #include "Channel.h"
 #include "Mixer.h"
+
+/* Dependencies - oscillators */
+#include "StandardOscillator.h"
+#include "LowFrequencyOscillator.h"
+#include "PcmPlaybackOscillator.h"
 
 /* Dependencies - waveforms */
 #include "DCWaveform.h"
@@ -40,8 +43,9 @@
 #include "SquareWaveform.h"
 #include "TriangleWaveform.h"
 
-/* Dependencies - ADSR envelope */
+/* Dependencies - ADSR envelopes */
 #include "AdsrEnvelope.h"
+#include "PassthroughEnvelope.h"
 #include "ExponentialResponse.h"
 #include "LinearResponse.h"
 
@@ -69,6 +73,9 @@ typedef struct {
 	char Subchunk2ID[4];    // "data"  string
 	uint32_t Subchunk2Size; // Sampled data length
 } WavHeader_t;
+
+// Demo PCM
+extern unsigned char rawData[9870];
 
 /**
  * Main function
@@ -98,12 +105,16 @@ int main(int argc, char** argv) {
 	a.release_time = CheapTune::AdsrEnvelope::msToTick(100);
 
 	/* Channels setup */
-	CheapTune::SinusWaveform w2;
-	CheapTune::AdsrEnvelope e2(&re, a);
-	CheapTune::StandardOscillator o2(&w2, 440);
-	mixer.channel(1).setAmplitude(255);
-	mixer.channel(1).setOscillator(&o2);
-	mixer.channel(1).setEnvelope(&e2);
+	//CheapTune::SinusWaveform w;
+	CheapTune::AdsrEnvelope e(&re, a);
+	//CheapTune::StandardOscillator o(&w, 440);
+	//CheapTune::PassthroughEnvelope e;
+	CheapTune::PcmPlaybackOscillator o;
+	o.writeBufferData((CheapTune::Sample_t*) rawData, 4935);
+	o.setLogicalBufferSize(4935);
+	mixer.channel(0).setAmplitude(255);
+	mixer.channel(0).setOscillator(&o);
+	mixer.channel(0).setEnvelope(&e);
 
 	/* Create output file */
 	std::cout << "Creating output file " << OUTPUT_FILENAME << std::endl;
@@ -155,12 +166,13 @@ int main(int argc, char** argv) {
 		std::cout << "Sound generation " << i + 1 << " of " << NB_SECONDS_RUN
 				<< std::endl;
 
-		((CheapTune::AdsrEnvelope*) mixer.channel(1).envelope())->noteOn();
+		((CheapTune::AdsrEnvelope*) mixer.channel(0).envelope())->noteOn();
+		((CheapTune::PcmPlaybackOscillator*) mixer.channel(0).oscillator())->restartCycle();
 		for (uint16_t j = 0; j < SAMPLE_RATE; ++j) {
 			buffer[j] = mixer.getSample();
 
 			if (j == (SAMPLE_RATE / 2))
-				((CheapTune::AdsrEnvelope*) mixer.channel(1).envelope())->noteOff();
+				((CheapTune::AdsrEnvelope*) mixer.channel(0).envelope())->noteOff();
 		}
 
 		/* Write the buffer */
