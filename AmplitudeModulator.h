@@ -40,7 +40,7 @@ public:
 	 * @param amplitude The amplitude to apply on the sample
 	 * @return The amplitude modulated sample
 	 */
-	static Sample_t compute(Sample_t sample, Amplitude_t amplitude) {
+	static inline Sample_t compute(Sample_t sample, Amplitude_t amplitude) {
 		return ((int32_t) sample) * amplitude / 255;
 	}
 
@@ -50,7 +50,7 @@ public:
 	 * @param percent The volume in percent
 	 * @return The computed amplitude value
 	 */
-	static Amplitude_t percentToAmplitude(uint8_t percent) {
+	static inline Amplitude_t percentToAmplitude(uint8_t percent) {
 		return ((uint16_t) percent) * 255 / 100;
 	}
 
