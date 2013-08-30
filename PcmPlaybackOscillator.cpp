@@ -1,10 +1,4 @@
-/*
- * PcmPlaybackOscillator.cpp
- *
- *  Created on: 30 août 2013
- *      Author: skywodd
- */
-
+/* Dependencies */
 #include "PcmPlaybackOscillator.h"
 
 namespace CheapTune {
