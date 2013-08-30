@@ -1,5 +1,5 @@
 /**
- * @brief Envelope generator - base class
+ * @brief Envelope generator - Pass-through envelope
  * @author SkyWodd
  * @version 2.0
  * @see http://skyduino.wordpress.com/
@@ -18,39 +18,25 @@
  *  You should have received a copy of the GNU General Public License\n
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\n
  */
-#ifndef ENVELOPE_H
-#define	ENVELOPE_H
+#ifndef PASSTHROUGHENVELOPE_H
+#define	PASSTHROUGHENVELOPE_H
 
 /* Dependencies */
-#include "defines.h"
+#include "Envelope.h"
 
 /** CheapTune namespace */
 namespace CheapTune {
 
 /**
- * Envelope base class
+ * Pass-through envelope class
  */
-class Envelope {
+class PassthroughEnvelope: public CheapTune::Envelope {
 public:
-	/**
-	 * Default destructor
-	 */
-	virtual ~Envelope();
 
-	/**
-	 * Compute an amplitude sample from the ADSR envelope
-	 *
-	 * @return The computed amplitude sample
-	 */
-	virtual Amplitude_t getSample() = 0;
-
-	/**
-	 * Reset all parameters to their default values
-	 */
-	virtual void reset();
+	Amplitude_t getSample();
 
 };
 
 }
 
-#endif	/* ENVELOPE_H */
+#endif	/* PASSTHROUGHENVELOPE_H */
