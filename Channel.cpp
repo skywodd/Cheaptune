@@ -6,7 +6,8 @@
 
 namespace CheapTune {
 
-Channel::Channel(Oscillator* oscillator, Envelope* envelope, Amplitude_t amplitude) :
+Channel::Channel(Oscillator* oscillator, Envelope* envelope,
+		Amplitude_t amplitude) :
 		_oscillator(oscillator), _envelope(envelope), _amplitude(amplitude) {
 }
 
@@ -24,6 +25,10 @@ void Channel::setAmplitude(Amplitude_t amplitude) {
 
 Sample_t Channel::getSample() {
 
+	/* Compute a sample only if channel is on */
+	if (!_amplitude)
+		return 0;
+
 	/* Get a sample from the oscillator and the envelope */
 	Sample_t sample = _oscillator->getSample();
 	Amplitude_t envelope = _envelope->getSample();
@@ -36,8 +41,10 @@ Sample_t Channel::getSample() {
 }
 
 void Channel::reset() {
-	_oscillator->reset();
-	_envelope->reset();
+	if (_oscillator)
+		_oscillator->reset();
+	if (_envelope)
+		_envelope->reset();
 	_amplitude = 255;
 }
 

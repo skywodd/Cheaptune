@@ -53,7 +53,7 @@ public:
 	 * @param envelope Envelope instance to use
 	 * @param amplitude The amplitude of this channel
 	 */
-	Channel(Oscillator* oscillator = 0, Envelope* envelope = 0, Amplitude_t amplitude = 255);
+	Channel(Oscillator* oscillator = 0, Envelope* envelope = 0, Amplitude_t amplitude = 0);
 
 	/**
 	 * Set the oscillator instance
