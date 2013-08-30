@@ -1,5 +1,5 @@
 /**
- * @brief High level waveform generation routine
+ * @brief High level waveform generation routine - base API
  * @author SkyWodd
  * @version 2.0
  * @see http://skyduino.wordpress.com/
@@ -18,8 +18,8 @@
  *  You should have received a copy of the GNU General Public License\n
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.\n
  */
-#ifndef OSCILLATOR_H
-#define	OSCILLATOR_H
+#ifndef OSCILLATOR_H_
+#define OSCILLATOR_H_
 
 /* Dependencies */
 #include "defines.h"
@@ -27,54 +27,15 @@
 /** CheapTune namespace */
 namespace CheapTune {
 
-/* Forward declaration of Waveform class */
-class Waveform;
-
 /**
- * High level waveform generation class
- * (based on Digital Direct Synthesis algorithm)
+ * High level waveform generation routine - base API
  */
 class Oscillator {
-protected:
-	/** Waveform generator instance */
-	Waveform* _waveform;
-
-	/** Tuning word for DDS */
-	WavetableIndex_t _tuningWord;
-
-	/** Phase accumulator for DDS */
-	WavetableIndex_t _phaseAccumulator;
-
-	/**	Sync flag */
-	bool _syncFlag;
-
 public:
-	/**
-	 * Instantiate a new oscillator
-	 *
-	 * @param waveform The waveform generator instance to use
-	 * @param frequency The frequency of the oscillator
-	 */
-	Oscillator(Waveform* waveform, Frequency_t frequency = 0);
-
 	/**
 	 * Default destructor
 	 */
 	virtual ~Oscillator();
-
-	/**
-	 * Set the frequency of the oscillator
-	 *
-	 * @param frequency The new frequency of the oscillator
-	 */
-	virtual void setFrequency(Frequency_t frequency);
-
-	/**
-	 * Set the waveform generator instance
-	 *
-	 * @param waveform A pointer to the new waveform generator
-	 */
-	void setWaveform(Waveform* waveform);
 
 	/**
 	 * Reset all parameters to their default values
@@ -82,36 +43,14 @@ public:
 	virtual void reset();
 
 	/**
-	 * Get the sync flag (set if the waveform cycle is done)
-	 *
-	 * @return True if the current waveform cycle is done
-	 */
-	bool isCycleFinished() const;
-
-	/**
-	 * Synchronize the oscillator (restart the waveform cycle)
-	 *
-	 * @param index Optional index for re-sync
-	 */
-	virtual void restartCycle(WavetableIndex_t index = 0);
-
-	/**
 	 * Get a sample from the oscillator
 	 *
 	 * @return The generated sample
 	 */
-	virtual Sample_t getSample();
-
-	/**
-	 * Get a pointer to the waveform generator
-	 *
-	 * @return A pointer to the waveform generator of this oscillator
-	 */
-	Waveform* waveform();
+	virtual Sample_t getSample() = 0;
 
 };
 
 }
 
-#endif	/* OSCILLATOR_H */
-
+#endif /* OSCILLATOR_H_ */

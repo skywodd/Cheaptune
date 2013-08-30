@@ -5,7 +5,7 @@ namespace CheapTune {
 
 LowFrequencyOscillator::LowFrequencyOscillator(Waveform* waveform,
 		Prescaler_t prescaler, Frequency_t frequency) :
-		Oscillator(waveform, frequency), _sample(0), _prescaler(prescaler), _counter(0) {
+		StandardOscillator(waveform, frequency), _sample(0), _prescaler(prescaler), _counter(0) {
 }
 
 void LowFrequencyOscillator::setPrescaler(Prescaler_t prescaler) {
@@ -24,7 +24,7 @@ Sample_t LowFrequencyOscillator::getSample() {
 	if(_counter == 0) {
 
 		/* Get a fresh sample */
-		_sample = Oscillator::getSample();
+		_sample = StandardOscillator::getSample();
 
 		/* Restart counter */
 		_counter = _prescaler;
@@ -41,12 +41,12 @@ void LowFrequencyOscillator::reset() {
 	_sample = 0;
 	_prescaler = 1;
 	_counter = 0;
-	Oscillator::reset();
+	StandardOscillator::reset();
 }
 
 void LowFrequencyOscillator::restartCycle(WavetableIndex_t index) {
 	_counter = 0;
-	Oscillator::restartCycle(index);
+	StandardOscillator::restartCycle(index);
 }
 
 }

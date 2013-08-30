@@ -22,7 +22,7 @@
 #define LOWFREQUENCYOSCILLATOR_H
 
 /* Dependencies */
-#include "Oscillator.h"
+#include "StandardOscillator.h"
 
 /** CheapTune namespace */
 namespace CheapTune {
@@ -30,7 +30,7 @@ namespace CheapTune {
 /**
  * High level waveform generation class - low frequency variant
  */
-class LowFrequencyOscillator: public CheapTune::Oscillator {
+class LowFrequencyOscillator: public CheapTune::StandardOscillator {
 protected:
 	/** The generated and cached sample */
 	Sample_t _sample;
@@ -60,11 +60,11 @@ public:
 
 	void setFrequency(Frequency_t frequency);
 
+	void restartCycle(WavetableIndex_t index = 0);
+
 	Sample_t getSample();
 
 	void reset();
-
-	void restartCycle(WavetableIndex_t index = 0);
 
 };
 
