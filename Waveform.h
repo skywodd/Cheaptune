@@ -48,7 +48,7 @@ public:
 	 * @param index The sample index in the waveform generator table
 	 * @return The computed sample for the given index
 	 */
-	virtual Sample_t getSample(WavetableIndex_t index);
+	virtual Sample_t getSample(WavetableIndex_t index) = 0;
 
 };
 
