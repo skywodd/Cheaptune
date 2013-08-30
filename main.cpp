@@ -27,11 +27,9 @@
 /* Cheaptune runtime */
 #include "defines.h"
 #include "AmplitudeModulator.h"
-#include "Waveform.h"
-#include "Oscillator.h"
+#include "StandardOscillator.h"
 #include "LowFrequencyOscillator.h"
 #include "Channel.h"
-#include "Envelope.h"
 #include "Mixer.h"
 
 /* Dependencies - waveforms */
@@ -100,33 +98,12 @@ int main(int argc, char** argv) {
 	a.release_time = CheapTune::AdsrEnvelope::msToTick(100);
 
 	/* Channels setup */
-	CheapTune::SinusWaveform w1;
-	CheapTune::Envelope e1;
-	CheapTune::Oscillator o1(&w1, 440);
-	mixer.channel(0).setAmplitude(0);
-	mixer.channel(0).setOscillator(&o1);
-	mixer.channel(0).setEnvelope(&e1);
-
 	CheapTune::SinusWaveform w2;
 	CheapTune::AdsrEnvelope e2(&re, a);
-	CheapTune::Oscillator o2(&w2, 440);
+	CheapTune::StandardOscillator o2(&w2, 440);
 	mixer.channel(1).setAmplitude(255);
 	mixer.channel(1).setOscillator(&o2);
 	mixer.channel(1).setEnvelope(&e2);
-
-	CheapTune::DCWaveform w3;
-	CheapTune::Envelope e3;
-	CheapTune::Oscillator o3(&w3);
-	mixer.channel(2).setAmplitude(0);
-	mixer.channel(2).setOscillator(&o3);
-	mixer.channel(2).setEnvelope(&e3);
-
-	CheapTune::DCWaveform w4;
-	CheapTune::Envelope e4;
-	CheapTune::Oscillator o4(&w4);
-	mixer.channel(3).setAmplitude(0);
-	mixer.channel(3).setOscillator(&o4);
-	mixer.channel(3).setEnvelope(&e4);
 
 	/* Create output file */
 	std::cout << "Creating output file " << OUTPUT_FILENAME << std::endl;
